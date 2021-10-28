@@ -6,6 +6,7 @@ import globby from 'globby';
 import yaml from 'js-yaml';
 import execa from 'execa';
 import chalk from 'chalk';
+import process from 'process';
 
 // yarn scripts <namespace=package_folder_name> <command=file_name>
 class ScriptsCommand extends Command<CommandContext> {
@@ -56,14 +57,19 @@ class ScriptsCommand extends Command<CommandContext> {
     cmds.forEach((cmd) => {
       this.context.stdout.write(`> Executing ${chalk.cyan(cmd)}\n`);
       this.context.stdout.write(`> Using cwd: ${chalk.blue(path.resolve(this.context.cwd, namespacePath))}\n\n`);
-      const result = execa.commandSync(cmd.trim(), {
-        cwd: path.resolve(this.context.cwd, namespacePath),
-        stdout: this.context.stdout,
-        stderr: this.context.stderr,
-      });
-      if (result.exitCode > 0) {
-        this.context.stdout.write(`> Execution was interrupted.\n`);
-        process.exit(result.exitCode)
+      try {
+        const result = execa.commandSync(cmd.trim(), {
+          cwd: path.resolve(this.context.cwd, namespacePath),
+          stdout: this.context.stdout,
+          stderr: this.context.stderr,
+        });
+        if (result.exitCode > 0) {
+          this.context.stdout.write(`> Execution was interrupted.\n`);
+          process.exit(result.exitCode)
+        }
+      } catch(error) {
+        process.exit(1);
+        // console.log(error);
       }
     });
   }

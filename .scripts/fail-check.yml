@@ -1,0 +1,3 @@
+- echo "HELLO"
+- yarn check --port 17603
+- echo "WORLD"

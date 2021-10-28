@@ -1,0 +1,3 @@
+- echo "Hello "
+- node ./.scripts/fail.js
+- echo "World"
