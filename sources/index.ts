@@ -56,11 +56,15 @@ class ScriptsCommand extends Command<CommandContext> {
     cmds.forEach((cmd) => {
       this.context.stdout.write(`> Executing ${chalk.cyan(cmd)}\n`);
       this.context.stdout.write(`> Using cwd: ${chalk.blue(path.resolve(this.context.cwd, namespacePath))}\n\n`);
-      execa.commandSync(cmd.trim(), {
+      const result = execa.commandSync(cmd.trim(), {
         cwd: path.resolve(this.context.cwd, namespacePath),
         stdout: this.context.stdout,
         stderr: this.context.stderr,
       });
+      if (result.exitCode > 0) {
+        this.context.stdout.write(`> Execution was interrupted.\n`);
+        process.exit(result.exitCode)
+      }
     });
   }
 }
